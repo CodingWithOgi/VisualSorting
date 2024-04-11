@@ -2,7 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ImageSorter extends JFrame {
     private JComboBox<String> sortComboBox;
@@ -27,7 +29,7 @@ public class ImageSorter extends JFrame {
         Container container = getContentPane();
         container.setLayout(new BorderLayout());
         container.add(menu,BorderLayout.NORTH);
-        container.add(imagePanel, BorderLayout.SOUTH);
+        container.add(imagePanel, BorderLayout.CENTER);
 
         circles = generateCircles();
 
@@ -69,9 +71,15 @@ public class ImageSorter extends JFrame {
     }
 
     private Circle[] generateCircles() {
-        Circle[] circles = new Circle[32];
-        for (int i = 0; i < circles.length; i++) {
-            int radius = (int) (Math.random() * 30) + 10;
+        int br=32;
+        Circle[] circles = new Circle[br];
+        List<Integer> list = new ArrayList<>();
+        for(int i=1;i<=br;i++){
+            list.add(i);
+        }
+        Collections.shuffle(list);
+        for (int i = 0; i < br; i++) {
+            int radius = list.get(i);
             circles[i] = new Circle(radius);
         }
         return circles;
@@ -97,14 +105,14 @@ public class ImageSorter extends JFrame {
 
     private ImageIcon createCircleIcon(int radius) {
         int diameter = radius * 2;
-        ImageIcon icon = new ImageIcon(new ImageIcon("src/pizza.png").getImage().getScaledInstance(diameter, diameter, Image.SCALE_DEFAULT));
+        ImageIcon icon = new ImageIcon(new ImageIcon("src/circle.png").getImage().getScaledInstance(diameter, diameter, Image.SCALE_DEFAULT));
         return icon;
     }
 
     private void slow(){
         SwingUtilities.invokeLater(() -> updateImagePanel(circles));
         try {
-            Thread.sleep(50);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -144,6 +152,9 @@ public class ImageSorter extends JFrame {
             merge(circles,l,r);
             slow();
         }
+//        for(int i=0;i<circles.length;i++){
+//            System.out.println(circles[i].getRadius());
+//        }
     }
 
     private void merge(Circle[] circles, int l, int r) {
@@ -153,7 +164,8 @@ public class ImageSorter extends JFrame {
 
         Circle[] L = new Circle[n1], R = new Circle[n2];
 
-        for (int j = 0; j < n1; j++) L[j] = circles[j];
+        for (int j = 0; j < n1; j++) L[j] = circles[j+l];
+
         for (int j = 0; j < n2; j++) R[j] = circles[m+1+j];
 
         int i = 0, j = 0, k = l;
